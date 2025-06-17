@@ -1,6 +1,6 @@
-from vui.s2t.audio_transcriber import AudioTranscriber
+from s2t.audio_transcriber import AudioTranscriber
 
-AUDIO_PATH = "rbg3.m4a"
+AUDIO_PATH = "simula.m4a"
 
 if __name__ == "__main__":
     transcriber = AudioTranscriber()
@@ -10,3 +10,6 @@ if __name__ == "__main__":
     transcribed_text = transcriber.transcribe_text_only(AUDIO_PATH)
     print("Transcribed text:")
     print(transcribed_text)
+
+    #2 parsing con LLM
+    
