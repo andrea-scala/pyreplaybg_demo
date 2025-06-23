@@ -1,0 +1,63 @@
+Transcribed text:
+Simula per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+Simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+confronta per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena con la terapia con 10% di basale in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}
+Transcribed text:
+simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di carbo in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 401 - {'error': {'message': 'No auth credentials found', 'code': 401}}

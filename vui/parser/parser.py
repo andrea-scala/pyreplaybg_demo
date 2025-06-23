@@ -40,20 +40,27 @@ def crea_paziente(result_json):
 def crea_dt(result_json):
     paziente = result_json.get("paziente")
     data = result_json.get("data")
+    #Log
     print(f"[CREA DIGITAL TWIN] Paziente: {paziente}, Data: {data}")
 
     # Carica informazioni del paziente
     patient_info_path = f"../patient_data/{paziente}.csv"
     patient_info = utils.load_patient_info(patient_info_path)
     if patient_info.empty:
+        #log
         print(f"[ERRORE] Paziente {paziente} non trovato ({patient_info_path}).")
+        #il messaggio da dare al t2s
+        #print(f"Il paziente {paziente} non esiste. Crea prima il paziente.")
         return
 
     # Carica dati giornalieri
     day_data_path = f"../patient_data/{paziente}_{data}.csv"
     day_data = utils.load_test_data(day_data_path)
     if day_data.empty:
+        #Log
         print(f"[ERRORE] Dati per il giorno {data} non trovati ({day_data_path}).")
+        # il messaggio da dare al t2s
+        #print(f"I dati per il giorno {data} non esistono.")
         return
 
     # Percorso di salvataggio
@@ -62,59 +69,89 @@ def crea_dt(result_json):
     file_path = os.path.join(SAVE_FOLDER, "results", "map", map_file_name)
 
     if os.path.exists(file_path):
+        # Log
         print(
             f"[ERRORE] Il twin per {paziente} per il giorno {data} esiste già: {file_path}"
         )
+        # Il messaggio da dare al t2s
+        # print(f"Il twin per {paziente} per il giorno {data} esiste già. Non verrà sovrascritto.")
         return
 
+    #log
     print(f"[OK] Creazione del twin in corso...")
+    # il messaggio da dare al t2s
+    # print(f"Creazione del twin per {paziente} per il giorno {data} in corso")
     twin_results = utils.twin(patient_info, day_data, save_name, SAVE_FOLDER)
     if not twin_results:
+        #Log
         print(
             f"[ERRORE] Creazione del twin fallita per {paziente} per il giorno {data}."
         )
+        # il messaggio da dare al t2s
+        # print(f"Creazione del twin per {paziente} per il giorno {data} fallita.")
         return
+    #Log
     print(f"[OK] Twin creato e salvato in {file_path}")
+    # il messaggio da dare al t2s
+    # print(f"Twin del paziente {paziente} per il giorno {data} creato.")
 
 def simula_dt(result_json):
     paziente = result_json.get("paziente")
     terapia = result_json.get("terapia")
     data = result_json.get("data")
+    # Log
     print(f"[SIMULA DT] Paziente: {paziente}, Terapia: {terapia}, Data: {data}")
-    #Esiste il dt del paziente?
-    save_name = f"{paziente}_{data}"
-    map_file_name = f"map_{save_name}.pkl"
-    file_path = os.path.join(SAVE_FOLDER, "results", "map", map_file_name)
-
-    if not os.path.exists(file_path):
-        print(
-            f"[ERRORE] Il twin per {paziente} per il giorno {data} non esiste: {file_path}"
-        )
-        return
-    print(f"[OK] Twin trovato: {file_path}")
+    
 
     # Carica informazioni del paziente
     patient_info_path = f"../patient_data/{paziente}.csv"
     patient_info = utils.load_patient_info(patient_info_path)
     if patient_info.empty:
+        # Log
         print(f"[ERRORE] Paziente {paziente} non trovato ({patient_info_path}).")
+        # il messaggio da dare al t2s
+        # print(f"Il paziente {paziente} non esiste. Crea prima il paziente.")
         return
 
     # Carica dati giornalieri
     day_data_path = f"../patient_data/{paziente}_{data}.csv"
     day_data = utils.load_test_data(day_data_path)
     if day_data.empty:
+        # Log
         print(f"[ERRORE] Dati per il giorno {data} non trovati ({day_data_path}).")
+        # il messaggio da dare al t2s
+        # print(f"I dati per il giorno {data} non esistono.")
         return
+    
+    #Esiste il dt del paziente?
+    save_name = f"{paziente}_{data}"
+    map_file_name = f"map_{save_name}.pkl"
+    file_path = os.path.join(SAVE_FOLDER, "results", "map", map_file_name)
+
+    if not os.path.exists(file_path):
+        #Log
+        print(
+            f"[ERRORE] Il twin per {paziente} per il giorno {data} non esiste: {file_path}"
+        )
+        # Il messaggio da dare al t2s
+        # print(f"Il twin per {paziente} per il giorno {data} non esiste. Crea prima il twin.")
+        return
+    #Log
+    print(f"[OK] Twin trovato: {file_path}")
     # utils.show_data_head(data=day_data, n=50)
     #Se la terapia è false o null, non applicare alcuna terapia
     if not terapia or terapia == "base" or terapia == "nessuna":
+        #Log
         print("[INFO] Terapia base o nessuna. Nessuna modifica applicata.")
         suffix_name = ""
     else:
+        #Log
         print(f"[OK] Terapia trovata: {terapia}")
         if not utils.verifica_terapia(terapia):
+            # Log
             print(f"[ERRORE] Terapia non valida: {terapia}")
+            # il messaggio da dare al t2s
+            # print("La terapia fornita non è valida")
             return
         # Se la terapia è valida, applicala
         # Nota: la funzione applica_terapia è commentata gestisce gli errori non internamente
@@ -128,61 +165,86 @@ def simula_dt(result_json):
 
     replay_results = utils.replay(patient_info, day_data, save_name, suffix_name, SAVE_FOLDER)
     if not replay_results:
+        #Log
         print(
             f"[ERRORE] Replay della terapia fallito per {paziente} per il giorno {data}."
         )
+        # il messaggio da dare al t2s
+        # print(f"Replay della terapia fallito per {paziente} per il giorno {data}.")
         return
+    #Log
     print(f"[OK] Replay della terapia completato per {paziente} per il giorno {data}.")
+    # il messaggio da dare al t2s
+    # print(f"Simulazione della terapia completato per {paziente} per il giorno {data}.")
 
 def analizza(result_json):
     from py_replay_bg.analyzer import Analyzer
     import pickle
+    #log
     print(f"[ANALIZZA] Intent: {result_json.get('intent')}")
     paziente = result_json.get("paziente")
     data = result_json.get("data")
     terapia = result_json.get("terapia")
 
     if terapia is None or not utils.verifica_terapia(terapia):
+        #Log
         print(f"[ERRORE] Terapia non valida o mancante: {terapia}")
+        # il messaggio da dare al t2s
+        # print("La terapia fornita non è valida o mancante.")
         return
 
     text = terapia.get("text")
     if not text:
+        #Log
         print(f"[ERRORE] Campo 'text' mancante nella terapia: {terapia}")
         return
 
     filepath = os.path.join(SAVE_FOLDER, 'results', 'workspaces', f'{paziente}_{data}{text}.pkl')
     if not os.path.exists(filepath):
+        #Log
         print(f"[ERRORE] File dei risultati non trovato: {filepath}")
+        # il messaggio da dare al t2s
+        # print(f"Simulazione non trovata per {paziente} per il giorno {data}.")
         return
 
     with open(filepath, 'rb') as file:
         replay_results = pickle.load(file)
 
     if not replay_results:
+        #Log
         print(f"[ERRORE] Replay results non trovati per {paziente} per il giorno {data}.")
+        # il messaggio da dare al t2s
+        # print(f"Simulazione non trovata per {paziente} per il giorno {data}.")
         return
 
     analysis = Analyzer.analyze_replay_results(replay_results)
+    # Log
     print(f"[ANALISI] Completata per  per {paziente} per il giorno {data} con terapia {text}.")
     # print(f"[ANALISI RISULTATI] {analysis}")
     return utils.stampa_analisi(analysis,text)
 
 def confronta(result_json):
+    # Log
     print(f"[CONFRONTA] Intent: {result_json.get('intent')}")
 
     paziente = result_json.get("paziente")
     data = result_json.get("data")
     terapie = result_json.get("terapia")  # Lista di 2 terapie
 
-    if not isinstance(terapie, list) or len(terapie) != 2:
-        print(f"[ERRORE] Devi fornire esattamente due terapie nel campo 'terapia'. Ricevuto: {terapie}")
+    if not isinstance(terapie, list) or len(terapie) < 2:
+        #Log
+        print(f"[ERRORE] Devi fornire almeno due terapie nel campo 'terapia'. Ricevuto: {terapie}")
+        # il messaggio da dare al t2s
+        # print("Devi fornire almeno due terapie.")
         return
 
     risultati = []
     for terapia in terapie:
         if not utils.verifica_terapia(terapia):
+            #Log
             print(f"[ERRORE] Terapia non valida: {terapia}")
+            # il messaggio da dare al t2s
+            # print("La terapia fornita non è valida.")
             return
         input_singolo = {
             "intent": "analizza",
@@ -192,7 +254,10 @@ def confronta(result_json):
         }
         risultato = analizza(input_singolo)
         if not risultato:
+            #Log
             print(f"[ERRORE] Analisi fallita per terapia: {terapia}")
+            # il messaggio da dare al t2s
+            # print(f"Analisi fallita per la terapia")
             return
 
         # risultato è dict, trasformiamolo in testo
@@ -218,5 +283,7 @@ def parse_output(result_json):
     elif intent == "confronta":
         return confronta(result_json)
     else:
+        #Log
         print(f"[ERRORE] Intent sconosciuto: {intent}")
-
+        # il messaggio da dare al t2s
+        # print("é stato fornito un comando sconosciuto.")
