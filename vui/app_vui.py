@@ -2,13 +2,17 @@ from s2t.audio_transcriber import AudioTranscriber
 from parser.agent import Agent, MedicalAgent
 import parser.parser as parser
 import json
-
+import os
+from dotenv import load_dotenv
 
 def main():
-    with open("parser/config.json") as f:
+    with open("parser/config.json", encoding="utf-8") as f:
         config = json.load(f)
 
-    API_KEY = config.get("api_key", "")
+    load_dotenv()  # carica variabili da .env
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    
     prompts = [
         #  "Simula per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena",
         #  "Simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più",
@@ -20,8 +24,8 @@ def main():
     ]
 
     transcriber = AudioTranscriber()
-    agent = Agent(API_KEY)
-    medicalAgent = MedicalAgent(API_KEY)
+    agent = Agent(api_key=api_key,prompt=config["prompt1"])
+    medicalAgent = MedicalAgent(api_key=api_key,prompt=config["prompt2"])
     for prompt in prompts:
         # print(f"\nTranscribing audio: {audio_path} ...")
         # Usa la trascrizione reale quando pronta
