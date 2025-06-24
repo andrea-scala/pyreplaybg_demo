@@ -1,0 +1,81 @@
+Transcribed text:
+Simula per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena
+Output LLM:
+{'intent': 'simula_dt', 'paziente': 'mario_rossi', 'data': '2025-05-05', 'terapia': {'quantità': 200, 'unità': 'g', 'operazione': 'inc', 'parametro': 'cho', 'pasto': 'D', 'text': '_cho-inc-200g-D'}}
+[SIMULA DT] Paziente: mario_rossi, Terapia: {'quantità': 200, 'unità': 'g', 'operazione': 'inc', 'parametro': 'cho', 'pasto': 'D', 'text': '_cho-inc-200g-D'}, Data: 2025-05-05
+[OK] Twin trovato: /home/andrea/reply_bg/pyreplaybg_demo/results/map/map_mario_rossi_2025-05-05.pkl
+[OK] Terapia trovata: {'quantità': 200, 'unità': 'g', 'operazione': 'inc', 'parametro': 'cho', 'pasto': 'D', 'text': '_cho-inc-200g-D'}
+[TERAPIA] ↓ 200.0g su 'cho' per pasto 'D'
+Running replay simulation
+Loading twinned model parameter realizations...
+Replaying scenario...
+Saving results in /home/andrea/reply_bg/pyreplaybg_demo/results/workspaces/mario_rossi_2025-05-05_cho-inc-200g-D.pkl
+[OK] Replay della terapia completato per mario_rossi per il giorno 2025-05-05.
+Parser Results:
+None
+Medical Agent Output:
+Nessun dato disponibile.
+Transcribed text:
+Simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più
+Output LLM:
+{'intent': 'simula_dt', 'paziente': 'mario_rossi', 'data': '2025-05-05', 'terapia': {'quantità': 10, 'unità': '%', 'operazione': 'inc', 'parametro': 'basal', 'text': '_basal-inc-10%'}}
+[SIMULA DT] Paziente: mario_rossi, Terapia: {'quantità': 10, 'unità': '%', 'operazione': 'inc', 'parametro': 'basal', 'text': '_basal-inc-10%'}, Data: 2025-05-05
+[OK] Twin trovato: /home/andrea/reply_bg/pyreplaybg_demo/results/map/map_mario_rossi_2025-05-05.pkl
+[OK] Terapia trovata: {'quantità': 10, 'unità': '%', 'operazione': 'inc', 'parametro': 'basal', 'text': '_basal-inc-10%'}
+[TERAPIA] ↓ 10.0% su 'basal'
+Running replay simulation
+Loading twinned model parameter realizations...
+Replaying scenario...
+Saving results in /home/andrea/reply_bg/pyreplaybg_demo/results/workspaces/mario_rossi_2025-05-05_basal-inc-10%.pkl
+[OK] Replay della terapia completato per mario_rossi per il giorno 2025-05-05.
+Parser Results:
+None
+Medical Agent Output:
+Nessun dato disponibile.
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena
+Output LLM:
+{'intent': 'analizza', 'paziente': 'mario_rossi', 'data': '2025-05-05', 'terapia': {'quantità': 200, 'unità': 'g', 'operazione': 'inc', 'parametro': 'cho', 'pasto': 'D', 'text': '_cho-inc-200g-D'}}
+[ANALIZZA] Intent: analizza
+[ANALISI] Completata per  per mario_rossi per il giorno 2025-05-05 con terapia _cho-inc-200g-D.
+Parser Results:
+{'titolo': '_cho-inc-200g-D', 'mean_glucose': '60.87325339986271', 'std_deviation': '128.373418341224', 'tir': '46.36363636363637', 'time_in_hypoglycemia': '43.78787878787879', 'time_in_hyperglycemia': '9.848484848484848'}
+Medical Agent Output:
+La glicemia media è 60.87 mg/dL. La deviazione standard è 128.37 mg/dL. Il TIR è del 46.36%. Il tempo in ipoglicemia è 43.79%. Il tempo in iperglicemia è 9.85%.
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più
+Output LLM:
+{'intent': 'analizza', 'paziente': 'mario_rossi', 'data': '2025-05-05', 'terapia': {'quantità': 10, 'unità': '%', 'operazione': 'inc', 'parametro': 'basal', 'text': '_basal-inc-10%'}}
+[ANALIZZA] Intent: analizza
+[ANALISI] Completata per  per mario_rossi per il giorno 2025-05-05 con terapia _basal-inc-10%.
+Parser Results:
+{'titolo': '_basal-inc-10%', 'mean_glucose': '171.81973895733557', 'std_deviation': '35.51468243137099', 'tir': '62.121212121212125', 'time_in_hypoglycemia': '0.0', 'time_in_hyperglycemia': '37.878787878787875'}
+Medical Agent Output:
+Errore: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}
+Transcribed text:
+confronta per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena con la terapia con 10% di basale in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}
+Transcribed text:
+analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}
+Transcribed text:
+simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di carbo in più
+Output LLM:
+{'error': "Errore durante la chiamata API: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}"}
+[ERRORE] Intent sconosciuto: None
+Parser Results:
+None
+Medical Agent Output:
+Errore: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1750723200000'}, 'provider_name': None}}, 'user_id': 'user_2yfqbcKj9LQYPwOSttStJc2hkZR'}
