@@ -1,26 +1,33 @@
 from s2t.audio_transcriber import AudioTranscriber
-from parser.agent import Agent, MedicalAgent
+from parser.agent_fallback import Agent, MedicalAgent
 import parser.parser as parser
 import json
 import os
 from dotenv import load_dotenv
 
 def main():
-    with open("parser/config.json", encoding="utf-8") as f:
-        config = json.load(f)
+    try:
+        with open(os.path.join("vui","parser","config.json"), encoding="utf-8") as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        with open(os.path.join("parser","config.json"), encoding="utf-8") as f:
+            config = json.load(f)
 
     load_dotenv()  # carica variabili da .env
 
     api_key = os.getenv("OPENAI_API_KEY")
-    
+    paziente = "Mario Rossi"
+    data = "6 maggio 25"
     prompts = [
-         "Simula per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena",
-         "Simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più",
-     "analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena",
-     "analizza per Mario Rossi per il 5 maggio 2025 la terapia con 10% di basale in più",
-     "confronta per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più a cena con la terapia con 10% di basale in più",
-    "analizza per Mario Rossi per il 5 maggio 2025 la terapia con 200gr di carbo in più",
-    "simula per Mario Rossi per il 5 maggio 2025 la terapia con 10% di carbo in più",
+         f"Crea il twin di {paziente} per la data {data}",
+         f"Simula per {paziente} per il giorno {data} la terapia base",
+         f"Simula per {paziente} per il giorno {data} la terapia con 200gr di carboidrati",
+         f"Analizza per {paziente} per il giorno {data} la terapia con 200gr di carboidrati",
+         f"Simula per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena",
+         f"Analizza per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena",
+         f"Confronta per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena con la terapia base",
+         f"Vorrei sapere cosa succede a {paziente} per il giorno {data} se mangia 200gr di carboidrati in meno a cena",
+         f"Analizza cosa succede a {paziente} per il giorno {data} se mangia 200gr di carboidrati in meno a cena",
     ]
 
     transcriber = AudioTranscriber()

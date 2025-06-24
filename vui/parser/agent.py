@@ -14,7 +14,7 @@ class Agent:
         if site_name:
             self.extra_headers["X-Title"] = site_name
 
-        self.model = "mistralai/devstral-small:free"
+        self.model = "deepseek/deepseek-chat-v3-0324:free"
 
         self.system_prompt = prompt
 

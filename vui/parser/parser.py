@@ -275,9 +275,9 @@ def parse_output(result_json):
     if intent == "crea_utente":
         crea_paziente(result_json)
     elif intent == "crea_dt":
-        crea_dt(result_json)
+        return crea_dt(result_json)
     elif intent == "simula_dt":
-        simula_dt(result_json)
+        return simula_dt(result_json)
     elif intent == "analizza":
         return analizza(result_json)
     elif intent == "confronta":
