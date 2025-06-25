@@ -17,7 +17,9 @@ class Agent:
         self.model = "deepseek/deepseek-chat-v3-0324:free"
 
         self.system_prompt = prompt
-
+        print(f"Agent initialized with model: {self.model}")
+        print(f"System prompt: {self.system_prompt}")
+        print(f"Extra headers: {self.extra_headers}")
     def extract_json(self, text):
         try:
             match = re.search(r"\{.*\}", text, re.DOTALL)

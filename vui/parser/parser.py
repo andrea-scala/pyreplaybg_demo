@@ -9,7 +9,7 @@ if root_dir not in sys.path:
 
 import utils
 
-SAVE_FOLDER = os.path.abspath("..")
+SAVE_FOLDER = os.path.abspath(".")
 
 
 def crea_paziente(result_json):
@@ -40,88 +40,78 @@ def crea_paziente(result_json):
 def crea_dt(result_json):
     paziente = result_json.get("paziente")
     data = result_json.get("data")
+    if not paziente:
+        return {"state": "error", "error": "Campo 'paziente' mancante nel JSON.", "messaggio": "Errore! Non hai indicato il paziente."}
+    if not data:
+        return {"state": "error", "error": "Campo 'data' mancante nel JSON.", "messaggio": "Errore! Non hai indicato la data."}
     #Log
     print(f"[CREA DIGITAL TWIN] Paziente: {paziente}, Data: {data}")
 
     # Carica informazioni del paziente
-    patient_info_path = f"../patient_data/{paziente}.csv"
-    patient_info = utils.load_patient_info(patient_info_path)
-    if patient_info.empty:
-        #log
+    patient_info_path = f"patient_data/{paziente}.csv"
+    try:
+        patient_info = utils.load_patient_info(patient_info_path)
+    except FileNotFoundError:
         print(f"[ERRORE] Paziente {paziente} non trovato ({patient_info_path}).")
-        #il messaggio da dare al t2s
-        #print(f"Il paziente {paziente} non esiste. Crea prima il paziente.")
-        return
+        return {"state": "error", "error": f"Paziente {paziente} non trovato.", "messaggio": f"Errore! Il paziente {paziente} non esiste. Crea prima il paziente o prova con qualcun altro."}
 
     # Carica dati giornalieri
-    day_data_path = f"../patient_data/{paziente}_{data}.csv"
-    day_data = utils.load_test_data(day_data_path)
-    if day_data.empty:
-        #Log
+    day_data_path = f"patient_data/{paziente}_{data}.csv"
+    try:
+        day_data = utils.load_test_data(day_data_path)
+    except FileNotFoundError:
         print(f"[ERRORE] Dati per il giorno {data} non trovati ({day_data_path}).")
-        # il messaggio da dare al t2s
-        #print(f"I dati per il giorno {data} non esistono.")
-        return
+        return {"state": "error", "error": f"Dati per il giorno {data} non trovati.", "messaggio": f"Errore! I dati per il giorno {data} non esistono. Carica prima i dati o prova con un altro giorno."}
+   
 
-    # Percorso di salvataggio
     save_name = f"{paziente}_{data}"
     map_file_name = f"map_{save_name}.pkl"
     file_path = os.path.join(SAVE_FOLDER, "results", "map", map_file_name)
 
     if os.path.exists(file_path):
-        # Log
-        print(
-            f"[ERRORE] Il twin per {paziente} per il giorno {data} esiste già: {file_path}"
-        )
-        # Il messaggio da dare al t2s
-        # print(f"Il twin per {paziente} per il giorno {data} esiste già. Non verrà sovrascritto.")
-        return
-
-    #log
+        print(f"[ERRORE] Il twin per {paziente} per il giorno {data} esiste già: {file_path}")
+        return {"state": "error", "error": f"Il twin per {paziente} per il giorno {data} esiste già.", "messaggio": f"Errore! Il twin per il paziente {paziente} per il giorno {data} esiste già."}
+    
     print(f"[OK] Creazione del twin in corso...")
     # il messaggio da dare al t2s
     # print(f"Creazione del twin per {paziente} per il giorno {data} in corso")
     twin_results = utils.twin(patient_info, day_data, save_name, SAVE_FOLDER)
     if not twin_results:
-        #Log
-        print(
-            f"[ERRORE] Creazione del twin fallita per {paziente} per il giorno {data}."
-        )
-        # il messaggio da dare al t2s
-        # print(f"Creazione del twin per {paziente} per il giorno {data} fallita.")
-        return
-    #Log
+        print(f"[ERRORE] Creazione del twin fallita per {paziente} per il giorno {data}.")
+        return {"state": "error", "error": f"Creazione del twin fallita per {paziente} per il giorno {data}.", "messaggio": f"Errore! Creazione del twin fallita per il paziente {paziente} per il giorno {data}."}
     print(f"[OK] Twin creato e salvato in {file_path}")
-    # il messaggio da dare al t2s
-    # print(f"Twin del paziente {paziente} per il giorno {data} creato.")
+    return {
+        "state": "success",
+        "message": f"Twin creato con successo.",
+    }
 
 def simula_dt(result_json):
     paziente = result_json.get("paziente")
     terapia = result_json.get("terapia")
     data = result_json.get("data")
-    # Log
     print(f"[SIMULA DT] Paziente: {paziente}, Terapia: {terapia}, Data: {data}")
-    
-
+    # Controlla se il paziente è specificato
+    if not paziente:
+        print("[ERRORE] Campo 'paziente' mancante nel JSON.")
+        return {"state": "error", "error": "Campo 'paziente' mancante nel JSON.", "messaggio": "Errore! Non hai indicato il paziente."}
+    if not data:
+        print("[ERRORE] Campo 'data' mancante nel JSON.")
+        return {"state": "error", "error": "Campo 'data' mancante nel JSON.", "messaggio": "Errore! Non hai indicato la data."}
     # Carica informazioni del paziente
-    patient_info_path = f"../patient_data/{paziente}.csv"
-    patient_info = utils.load_patient_info(patient_info_path)
-    if patient_info.empty:
-        # Log
+    patient_info_path = f"patient_data/{paziente}.csv"
+    try:
+        patient_info = utils.load_patient_info(patient_info_path)
+    except FileNotFoundError:
         print(f"[ERRORE] Paziente {paziente} non trovato ({patient_info_path}).")
-        # il messaggio da dare al t2s
-        # print(f"Il paziente {paziente} non esiste. Crea prima il paziente.")
-        return
+        return {"state": "error", "error": f"Paziente {paziente} non trovato.", "messaggio": f"Errore! Il paziente {paziente} non esiste. Crea prima il paziente o prova con qualcun altro."}
 
     # Carica dati giornalieri
-    day_data_path = f"../patient_data/{paziente}_{data}.csv"
-    day_data = utils.load_test_data(day_data_path)
-    if day_data.empty:
-        # Log
+    day_data_path = f"patient_data/{paziente}_{data}.csv"
+    try:
+        day_data = utils.load_test_data(day_data_path)
+    except FileNotFoundError:
         print(f"[ERRORE] Dati per il giorno {data} non trovati ({day_data_path}).")
-        # il messaggio da dare al t2s
-        # print(f"I dati per il giorno {data} non esistono.")
-        return
+        return {"state": "error", "error": f"Dati per il giorno {data} non trovati.", "messaggio": f"Errore! I dati per il giorno {data} non esistono. Carica prima i dati o prova con un altro giorno."}
     
     #Esiste il dt del paziente?
     save_name = f"{paziente}_{data}"
@@ -129,16 +119,10 @@ def simula_dt(result_json):
     file_path = os.path.join(SAVE_FOLDER, "results", "map", map_file_name)
 
     if not os.path.exists(file_path):
-        #Log
-        print(
-            f"[ERRORE] Il twin per {paziente} per il giorno {data} non esiste: {file_path}"
-        )
-        # Il messaggio da dare al t2s
-        # print(f"Il twin per {paziente} per il giorno {data} non esiste. Crea prima il twin.")
-        return
-    #Log
+        print(f"[ERRORE] Il twin per {paziente} per il giorno {data} non esiste: {file_path}")
+        return {"state": "error", "error": f"Il twin per {paziente} per il giorno {data} non esiste.", "messaggio": f"Errore! Il twin per il paziente {paziente} per il giorno {data} non esiste. Crea prima il twin o prova con un altro giorno."}
     print(f"[OK] Twin trovato: {file_path}")
-    # utils.show_data_head(data=day_data, n=50)
+    
     #Se la terapia è false o null, non applicare alcuna terapia
     if not terapia or terapia == "base" or terapia == "nessuna":
         #Log
@@ -148,34 +132,27 @@ def simula_dt(result_json):
         #Log
         print(f"[OK] Terapia trovata: {terapia}")
         if not utils.verifica_terapia(terapia):
-            # Log
             print(f"[ERRORE] Terapia non valida: {terapia}")
-            # il messaggio da dare al t2s
-            # print("La terapia fornita non è valida")
-            return
+            return {"state": "error", "error": f"Terapia non valida: {terapia}", "messaggio": f"Errore! La terapia fornita non è valida."}
         # Se la terapia è valida, applicala
         # Nota: la funzione applica_terapia è commentata gestisce gli errori non internamente
-        day_data = utils.applica_terapia(day_data, terapia)
-        # try:
-        #     day_data = utils.applica_terapia(day_data, terapia)
-        # except Exception as e:
-        #     print(f"{e}")
-        #     return
+        try:
+            day_data = utils.applica_terapia(day_data, terapia)
+        except Exception as e:
+            print(f"[ERRORE] Applicazione della terapia fallita: {e}")
+            return {"state": "error", "error": f"Applicazione della terapia fallita: {e}", "messaggio": f"Errore! Applicazione della terapia fallita."}
         suffix_name = f"{terapia['text']}" 
 
     replay_results = utils.replay(patient_info, day_data, save_name, suffix_name, SAVE_FOLDER)
     if not replay_results:
-        #Log
-        print(
-            f"[ERRORE] Replay della terapia fallito per {paziente} per il giorno {data}."
-        )
-        # il messaggio da dare al t2s
-        # print(f"Replay della terapia fallito per {paziente} per il giorno {data}.")
-        return
+       print(f"[ERRORE] Replay fallito per {paziente} per il giorno {data}.")
+       return {"state": "error", "error": f"Replay fallito per {paziente} per il giorno {data}.", "messaggio": f"Errore! Simulazione fallita per il paziente {paziente} per il giorno {data}."}
     #Log
     print(f"[OK] Replay della terapia completato per {paziente} per il giorno {data}.")
-    # il messaggio da dare al t2s
-    # print(f"Simulazione della terapia completato per {paziente} per il giorno {data}.")
+    return {
+        "state": "success",
+        "message": f"Simulazione della terapia completato per {paziente} per il giorno {data}.",
+    }
 
 def analizza(result_json):
     from py_replay_bg.analyzer import Analyzer

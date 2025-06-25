@@ -1,205 +1,106 @@
-# app.py
-import traceback
-from bottle import route, run, template, request, static_file, HTTPResponse, response
+from bottle import *
+import io
+import tempfile
+from vui.s2t.audio_transcriber import AudioTranscriber
+from vui.parser.agent import Agent, MedicalAgent
+import vui.parser.parser as parser
 import json
-import uuid
-from py_replay_bg.py_replay_bg import ReplayBG
-from py_replay_bg.analyzer import Analyzer
-import utils
-from threading import Thread
+import os
+from dotenv import load_dotenv
 
-# Dizionario globale per tenere traccia dei job
-JOB_STATUS = {}
+# @route("/get_prompt", method=["POST"])
+# def get_prompt():
+#     audio_file = request.files.get('audio')  # <-- questa è la chiave usata in formData.append()
+#     if audio_file:
+#         audio_file_bytes = io.BytesIO(audio_file.file.read())
+#         with tempfile.NamedTemporaryFile(suffix=".m4a") as temp_file:
+#             temp_file.write(audio_file_bytes.getbuffer())
+#             temp_file.flush()
+#             transcribed_text = transcriber.transcribe_text_only(temp_file.name)
+#             print(f"Transcribed text: {transcribed_text}")
+#             result = agent.ask(transcribed_text)
+#             print(f"Output LLM: {result}")
+#             parser_results = parser.parse_output(result)
+#             print(f"Parser Results: {parser_results}")
+#             medical_agent_results = medicalAgent.ask(parser_results)
+#             print(medical_agent_results)
+#             return medical_agent_results
 
-# Funzione di risposta in caso di errore
-def error_response(status_code, message):
-    body = json.dumps({"status": "error", "message": message})
-    return HTTPResponse(status=status_code, body=body, content_type="application/json")
-
-#Funzione per la simulazione del twin in modo asincrono
-def replay_twin_async(dati_paziente, dati_ottimizzazione_modello, save_name, suffix_name, job_id, titolo = "base"):
-    try:
-        JOB_STATUS[job_id] = {"state": "in_progress", "message": "Simulazione Digital Twin in corso..."}
-
-        # Esegui la simulazione
-        replay_results = utils.replay(dati_paziente, dati_ottimizzazione_modello, save_name, suffix_name)
-
-        # Esegui l'analisi dei risultati
-        analysis = Analyzer.analyze_replay_results(replay_results, data=dati_ottimizzazione_modello)
-        
-        json_results = {
-            "titolo": titolo,
-            "mean_glucose": f"{analysis['median']['glucose']['variability']['mean_glucose']}",
-            "std_deviation": f"{analysis['median']['glucose']['variability']['std_glucose']}",
-            "tir": f"{analysis['median']['glucose']['time_in_ranges']['time_in_target']}",
-            "time_in_hypoglycemia": f"{analysis['median']['glucose']['time_in_ranges']['time_in_hypoglycemia']}",
-            "time_in_hyperglycemia": f"{analysis['median']['glucose']['time_in_ranges']['time_in_hyperglycemia']}"
-        }
-      
-        #TODO Stampa i risultati piuttosto che restituirli cosi dato che analysys sembra non serializzabile. oppure crea un diz a partire da essi
-        JOB_STATUS[job_id] = {
-            "state": "done",
-            "message": "Simulazione e analisi completate con successo",
-            "analysis": json_results
-        }
-        
-    except Exception as e:
-        JOB_STATUS[job_id] = {
-            "state": "error",
-            "message": "Errore nella simulazione o nell'analisi",
-            "details": str(e),
-        }
-        
-def crea_twin_async(dati_paziente, dati_ottimizzazione_modello, save_name, job_id):
-    try:
-        # Inizializza lo stato del job come "in_progress"
-        JOB_STATUS[job_id] = {"state": "in_progress", "message": "Creazione Digital Twin in corso..."}
-
-        # Avvia la creazione del twin
-        utils.twin(dati_paziente, dati_ottimizzazione_modello, save_name)
-
-        # Quando il processo è finito correttamente
-        JOB_STATUS[job_id] = {"state": "done", "message": "Twin creato con successo"}
-    except Exception as e:
-        # In caso di errore, memorizza l'errore nello stato del job
-        JOB_STATUS[job_id] = {
-            "state": "error",
-            "message": "Errore nella creazione del Twin",
-            "details": str(e),
-        }
-        
-#Messaggio SImulazione dt avviata anche se questa route da errire
-@route("/status/<job_id>")
-def status(job_id):
-    # Controlla se il job_id esiste nel dizionario JOB_STATUS
-    job_state = JOB_STATUS.get(job_id)
-
-    if job_state is None:
-        return error_response(404, "Job non trovato")
-
-    return json.dumps(job_state)
+paziente = "Mario Rossi"
+data = "6 maggio 25"
+prompts = [
+        f"Crea il twin di {paziente} per la data {data}",
+        f"Simula per {paziente} per il giorno {data} la terapia base",
+        f"Simula per {paziente} per il giorno {data} la terapia con 200gr di carboidrati",
+        f"Analizza per {paziente} per il giorno {data} la terapia con 200gr di carboidrati",
+        f"Simula per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena",
+        f"Analizza per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena",
+        f"Confronta per {paziente} per il giorno {data} la terapia con 200gr di carboidrati in più a cena con la terapia base",
+        f"Vorrei sapere cosa succede a {paziente} per il giorno {data} se mangia 200gr di carboidrati in meno a cena",
+        f"Analizza cosa succede a {paziente} per il giorno {data} se mangia 200gr di carboidrati in meno a cena",
+]
 
 
-@route("/crea_dt", method="POST")
-def crea_dt():
-    dati_paziente_file = request.files.get("dati_paziente")
-    dati_ottimizzazione_modello_file = request.files.get("dati_ottimizzazione_modello")
-    nome_nuovo_dt = request.forms.get("nome_nuovo_dt")
+@route("/get_prompt", method=["GET"])
+def get_prompt_get():
+    idx = int(request.query.get('idx', 0))
+    if idx < 0 or idx >= len(prompts):
+        return {"error": "Indice prompt non valido"}
+    transcribed_text = prompts[idx]
+    print(f"Transcribed text (GET): {transcribed_text}")
+    result = agent.ask(transcribed_text)
+    print(f"Output LLM: {result}")
+    parser_results = parser.parse_output(result)
+    print(f"Parser Results: {parser_results}")
+    medical_agent_results = medicalAgent.ask(parser_results)
+    print(medical_agent_results)
+    return medical_agent_results
 
-    # Validazione input
-    if not dati_paziente_file:
-        return error_response(400, "File 'dati_paziente' non trovato")
-    if not dati_ottimizzazione_modello_file:
-        return error_response(400, "File 'dati_ottimizzazione_modello' non trovato")
-    if not nome_nuovo_dt:
-        return error_response(400, "Nome nuovo digital twin mancante")
-
-    # Parsing file
-    try:
-        dati_paziente = utils.load_patient_info(dati_paziente_file.file)
-        print(dati_paziente)
-        dati_ottimizzazione_modello = utils.load_test_data(
-            dati_ottimizzazione_modello_file.file
-        )
-    except Exception as e:
-        return error_response(422, f"Errore nel parsing dei file: {e}")
-
-    # Generazione job_id
-    job_id = str(uuid.uuid4())
-    save_name_unico = f"{nome_nuovo_dt}"
-
-    # Avvio del processo in background
-    try:
-        t = Thread(
-            target=crea_twin_async,
-            args=(dati_paziente, dati_ottimizzazione_modello, save_name_unico, job_id),
-        )
-        t.daemon = True
-        t.start()
-    except Exception as e:
-        return error_response(500, f"Errore interno nell'avvio del processo: {e}")
-
-    # Risposta asincrona con job_id
-    response.content_type = "application/json"
-    return json.dumps(
-        {
-            "status": "in_progress",
-            "job_id": job_id,
-            "message": "Creazione del Digital Twin avviata",
-        }
-    )
-
-#Ora creiamo la route replay_dt, che accetta da formdata: il nome del dt (nome_dt) e lo scenario (scenario)
-@route("/replay_dt", method="POST")
-def replay_dt():
-    dati_paziente_file = request.files.get("dati_paziente")
-    dati_ottimizzazione_modello_file = request.files.get("dati_ottimizzazione_modello")
-    nome_dt = request.forms.get("nome_dt")
-    scenario = request.forms.get("scenario")
-    
-    # Validazione input
-    if not dati_paziente_file:
-        return error_response(400, "File 'dati_paziente' non trovato")
-    if not dati_ottimizzazione_modello_file:
-        return error_response(400, "File 'dati_ottimizzazione_modello' non trovato")
-    if not nome_dt:
-        return error_response(400, "Nome del digital twin mancante")
-    if not scenario:
-        return error_response(400, "Scenario mancante")
-    
-    # Parsing file
-    try:
-        dati_paziente = utils.load_patient_info(dati_paziente_file.file)
-        print(dati_paziente)
-        dati_ottimizzazione_modello = utils.load_test_data(
-            dati_ottimizzazione_modello_file.file
-        )
-    except Exception as e:
-        return error_response(422, f"Errore nel parsing dei file: {e}")
-
-    if scenario == "base":
-        titolo = "Simulazione con gli stessi dati del twinning"
-        suffix_name = "_base"
-    elif scenario == "bolo30meno":
-        titolo = "Simulazione con bolo ridotto del 30%"
-        suffix_name = "_bolo30meno"
-        dati_ottimizzazione_modello["bolus"] = dati_ottimizzazione_modello["bolus"] * 0.7
-    else:
-        return error_response(400, "Scenario non valido")
-    # Generazione job_id
-    job_id = str(uuid.uuid4())
-    save_name_unico = f"{nome_dt}"
-    
-    # Avvio del processo in background
-    try:
-        t = Thread(
-            target=replay_twin_async,
-            args=(dati_paziente, dati_ottimizzazione_modello, save_name_unico, suffix_name, job_id, titolo)
-        )
-        t.daemon = True
-        t.start()
-    except Exception as e:
-        return error_response(500, f"Errore interno nell'avvio del processo: {e}")
-
-    # Risposta asincrona con job_id
-    response.content_type = "application/json"
-    return json.dumps(
-        {
-            "status": "in_progress",
-            "job_id": job_id,
-            "message": "Simulazione del Digital Twin avviata",
-        }
-    )
-    
-    
 @route("/")
 def index():
     return template("index.tpl")
 
+@route("/get_prompt", method=["POST"])
+def get_prompt():
+    audio_file = request.files.get('audio')  # <-- questa è la chiave usata in formData.append()
+    if audio_file:
+        audio_file_bytes = io.BytesIO(audio_file.file.read())
+        with tempfile.NamedTemporaryFile(suffix=".m4a") as temp_file:
+            temp_file.write(audio_file_bytes.getbuffer())
+            temp_file.flush()
+            transcribed_text = transcriber.transcribe_text_only(temp_file.name)
+            print(f"Transcribed text: {transcribed_text}")
+            result = {"stato":1,"messaggio": "Trascrizione effettuata.","risultato":transcribed_text}
+            print("type of result:", type(result))
+            return {"stato":1,"messaggio": "Conversione in testo effettuata.","risultato":transcribed_text}
+    return {
+        "stato":0,"messaggio": "Errore, riprova ad inviare il prompt.","risultato": False
+    }
+    
+@route("/to_json", method=["POST"])
+def to_json():
+    prompt = request.params.get('prompt')    
+    agent_response = agent.ask(prompt)
+    print(type(agent_response))
+    print(agent_response)
+    return {"stato":1,"messaggio": "Risposta dell'agent ottenuta.","risultato":agent_response}
 
 @route("/static/<filepath:path>")
 def server_static(filepath):
     return static_file(filepath, root="static")
 
 
-run(host="localhost", server="paste", port=8080, debug=True, reloader=True)
+try:
+    with open(os.path.join("vui","parser","config.json"), encoding="utf-8") as f:
+        config = json.load(f)
+except FileNotFoundError:
+    with open(os.path.join("parser","config.json"), encoding="utf-8") as f:
+        config = json.load(f)
+load_dotenv()  # carica variabili da .env
+api_key = os.getenv("OPENAI_API_KEY")
+# print(api_key)
+# print(config)
+transcriber = AudioTranscriber()
+agent = Agent(api_key=api_key,prompt=config["prompt1"])
+medicalAgent = MedicalAgent(api_key=api_key,prompt=config["prompt2"])
+run(host="localhost", port=8080, debug=True, reloader=True)

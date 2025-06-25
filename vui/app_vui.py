@@ -1,5 +1,5 @@
 from s2t.audio_transcriber import AudioTranscriber
-from parser.agent_fallback import Agent, MedicalAgent
+from parser.agent import Agent, MedicalAgent
 import parser.parser as parser
 import json
 import os
